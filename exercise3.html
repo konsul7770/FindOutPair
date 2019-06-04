@@ -1,0 +1,123 @@
+<html>
+	<head>
+		<style>
+			table, th, td {
+  			border: 1px solid black;
+		}
+		</style>
+	</head>
+	<body>
+	<table style="width:480px;height:480px">
+	<tr>
+		<td id="c0"></td>
+		<td id = "c1"></td>
+		<td id = "c2"></td>
+		<td id = "c3"></td>
+	</tr>
+	<tr>
+		<td id = "c4"></td>
+		<td id = "c5"></td>
+		<td id = "c6"></td>
+		<td id = "c7"></td>
+	</tr>
+	<tr>
+		<td id = "c8"></td>
+		<td id = "c9"></td>
+		<td id = "c10"></td>
+		<td id = "c11"></td>
+	</tr>
+	<tr>
+		<td id = "c12"></td>
+		<td id = "c13"></td>
+		<td id = "c14"></td>
+		<td id = "c15"></td>
+	</tr>
+	</table><br>
+	<button onclick="start()">Старт</button><br><br>
+	<span id="minutes">00</span>:<span id="seconds">00</span>
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<script type="text/javascript">
+		var colors = []; //массив для хранения цветов и счетчиков их использования
+		var cells = [];  //массив, в котором хранятся цвета каждой клетки
+		var couple = 0;  //переменная нужна для определения, нажата ли пара кнопок
+		var first = -1;  //в переменной хранится номер первой нажатой кнопки в паре
+		var time;        //переменная для хранения выражения функции таймера
+		var pair = 0;  //переменная нужна для определения, собраны ли все пары клеток
+		
+		
+		//функция генерации 8 пар цветов для 16 клеток
+		//вызывается при нажатии кнопки Старт
+		function start(){
+			colors = [
+			{name:"yellow",count:2},
+			{name:"orange",count:2},
+			{name:"pink",count:2},
+			{name:"purple",count:2},
+			{name:"blue",count:2},
+			{name:"green",count:2},
+			{name:"brown",count:2},
+			{name:"red",count:2}
+			];
+			pair = 0;
+			timer();
+			for(i = 0; i < 16; i++){
+				var elem = Math.floor(Math.random()*colors.length);
+				cells.push(colors[elem].name);
+				colors[elem].count--;
+				if(colors[elem].count == 0){
+					colors.splice(elem,1);
+				}
+				document.getElementById("c"+i).setAttribute("onclick","game("+i+")");
+				document.getElementById("c"+i).style.backgroundColor = "white";
+			}
+		}
+		
+		
+		//функция игры, вызывается при нажатии на клетку
+		function game(id){
+			if (couple == 0){
+				first = id;
+				document.getElementById("c"+id).removeAttribute("onclick");
+				document.getElementById("c"+id).style.backgroundColor = cells[id];
+				couple++;
+				return;
+			}
+			if(couple == 1){
+				if (cells[first] == cells[id]){
+					document.getElementById("c"+id).removeAttribute("onclick");
+					document.getElementById("c"+id).style.backgroundColor = cells[id];
+					first = -1;
+					couple = 0;
+					pair++;
+					if (pair == 8){
+						clearInterval ( time );
+						cells.splice(0,cells.length);
+						var m = document.getElementById("minutes").innerText;
+						var s = document.getElementById("seconds").innerText;
+						swal("Вы выйграли!","Затраченное время "+m+":"+s);
+					}
+				}else{
+					document.getElementById("c"+first).style.backgroundColor = "white";
+					document.getElementById("c"+first).setAttribute("onclick","game("+first+")");
+					couple = 0;
+					first = -1;
+				}
+			}
+		}
+		
+		
+		//функция таймера
+		function timer(){
+			var startTime = Date.now();
+			
+			function pad ( val ) { return val > 9 ? val : "0" + val; }
+			
+			time = setInterval( function(){
+			var elapsedTime = Date.now() - startTime;
+			document.getElementById("seconds").innerHTML=pad(((elapsedTime / 1000)%60).toFixed(3));
+			document.getElementById("minutes").innerHTML=pad(parseInt((elapsedTime / 60000),10));   
+			}, 100);
+		}
+	</script>
+	</body>
+</html>
